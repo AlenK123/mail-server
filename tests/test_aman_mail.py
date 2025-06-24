@@ -142,14 +142,16 @@ def test__inbound_authentication_correct_credentials(server):
         }
     ],
 )
-def test__email_proxy(server, hostname):
+def test__email_proxy(server, hostname, mocker):
     class Handler(AsyncMessage):
         def handle_message(self, message):
-            assert message["Subject"] == "Some Subject"
             return super().handle_message(message)
 
+    handler = Handler()
+    spy = mocker.spy(handler, "handle_message")
+
     controller = Controller(
-        handler=Handler(),
+        handler=handler,
         hostname=hostname,
         port=1028,
         authenticator=authenticator,
@@ -168,6 +170,8 @@ def test__email_proxy(server, hostname):
         server.send_message(msg)
 
     controller.stop()
+
+    assert spy.call_count == 1
 
 
 @pytest.mark.skip(reason="TODO: Implement")
