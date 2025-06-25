@@ -105,8 +105,8 @@ def server(handler, authenticator, hostname, port):
 )
 def test__inbound_authentication_incorrect_credentials(server):
     with pytest.raises(smtplib.SMTPAuthenticationError) as e:
-        with smtplib.SMTP(server.hostname, server.port) as server:
-            server.login("asd@inbound.com", "aasdd")
+        with smtplib.SMTP(server.hostname, server.port) as client:
+            client.login("asd@inbound.com", "aasdd")
         assert isinstance(e, Exception)
 
 
@@ -125,8 +125,8 @@ def test__inbound_authentication_incorrect_credentials(server):
 )
 def test__inbound_authentication_correct_credentials(server):
 
-    with smtplib.SMTP(server.hostname, server.port) as server:
-        code, resp = server.login("test@inbound.com", "secret")
+    with smtplib.SMTP(server.hostname, server.port) as client:
+        code, resp = client.login("test@inbound.com", "secret")
 
         assert code == 235  # SMTP authentication success code
 
@@ -159,15 +159,15 @@ def test__email_proxy(server, hostname, mocker):
     )
     controller.start()
 
-    with smtplib.SMTP(server.hostname, server.port) as server:
+    with smtplib.SMTP(server.hostname, server.port) as client:
         msg = EmailMessage()
         msg["Subject"] = "Some Subject"
         msg["From"] = "some@e2e.com"
         msg["To"] = "other@e2e.com"
         msg.set_content("Some Content")
 
-        server.ehlo()  # Identify ourselves to
-        server.send_message(msg)
+        client.ehlo()  # Identify ourselves to
+        client.send_message(msg)
 
     controller.stop()
 
