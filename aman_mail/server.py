@@ -36,7 +36,7 @@ def run_mail_proxy(
 ):
     """Starts the SMTP proxy server with the specified routing configuration."""
     route_controller = RouteController(routing=routing)
-    handler = ProxyWatermarkHandler(route_controller)
+    handler = ProxyWatermarkHandler(route_controller, watermark="This is a watermark")
     authenticator = Authenticator(route_controller)
 
     controller = Controller(
